@@ -1,10 +1,9 @@
-module FastxPipe where
+module Pipes.Fastx where
 
 import Data.Attoparsec.Char8
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as B8
 import Data.ByteString.Internal (ByteString(..), memcpy)
-import Blaze.ByteString.Builder
 import Control.Monad
 import Control.Applicative
 import Control.Exception
@@ -24,7 +23,7 @@ skipTill c = skipWhile (/= c) *> char c *> pure ()
 
 parseFasta :: Parser (ByteString, ByteString)
 parseFasta = (,) <$> (char '>' *> takeTill' '\n') <*> multiline where
-    multiline = toByteString . mconcat <$> (many1 $ fromByteString <$> do
+    multiline = mconcat <$> (many1 $ do
         Just c <- peekChar
         if c == '>' then fail "next" else takeTill' '\n')
 
